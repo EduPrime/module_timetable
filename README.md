@@ -1,6 +1,6 @@
 # Timetable Module 🕒🚀
 
-**Welcome, Hermes!**  
+**Welcome!**  
 Your new _Timetable Module_ is here to make life in the EduPrime ecosystem a breeze. Built with Ionic + Vue.js and packed with AI magic, you'll never miss a class again.
 
 ## ⚙️ Features
