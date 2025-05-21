@@ -1,76 +1,67 @@
 <script setup lang="ts">
-import ContentLayout from '@/components/theme/ContentLayout.vue'
-import { IonButton, IonCol, IonIcon, IonRow, IonSearchbar, IonTitle, IonToolbar } from '@ionic/vue'
-import { add } from 'ionicons/icons'
-import { ref, onMounted, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { IonCard, IonCardHeader, IonCardTitle, IonCol, IonRow } from '@ionic/vue'
+import { computed, ref } from 'vue'
+import ClassSelector from '../components/ClassSelector.vue'
+import ScheduleGrid from '../components/ScheduleGrid.vue'
+import SubjectList from '../components/SubjectList.vue'
+import TeacherSelector from '../components/TeacherSelector.vue'
+import { classes, subjects, teachers } from '../services/fakeData'
 
-// Importar o serviço e o componente gerados
-import Timetable from '../components/Timetable.vue'
-import TimetableService from '../services/TimetableService'
+const selectedTeacherId = ref<number>()
+const selectedClassId = ref<number>()
+const timetable = ref<any[]>([])
 
-// Instanciar o serviço
-const timetableService = new TimetableService()
+const selectedTeacher = computed(() =>
+  teachers.find(t => t.id === selectedTeacherId.value),
+)
+const teacherSubjects = computed(() =>
+  subjects.filter(s => selectedTeacher.value?.subjects.includes(s.id)),
+)
+const selectedClass = computed(() =>
+  classes.find(c => c.id === selectedClassId.value),
+)
 
-const router = useRouter()
-
-// Variáveis reativas
-const dataList = ref([])
-const searchQuery = ref('')
-
-// Carregar dados ao montar o componente
-onMounted(async () => {
-  await loadData()
-})
-
-// Função para carregar os dados usando o serviço
-async function loadData() {
-  try {
-    const data = await timetableService.getAll()
-    dataList.value = data || []
-    console.log('Dados carregados:', data)
-  } catch (error) {
-    console.error('Erro ao carregar os dados:', error)
+function addToTimetable({ day, hour, subjectId }: { day: string, hour: string, subjectId: number }) {
+  if (selectedTeacherId.value && selectedClassId.value && subjectId) {
+    timetable.value.push({
+      day,
+      hour,
+      subjectId,
+      teacherId: selectedTeacherId.value,
+      classId: selectedClassId.value,
+    })
   }
 }
-
-// Função para navegar para a página de registro
-function navigateToRegister() {
-  router.push({ name: 'RegisterTimetable' })
-}
-
-// Computed para filtrar os dados com base na busca
-const filteredData = computed(() => {
-  if (!searchQuery.value) {
-    return dataList.value
-  }
-  return dataList.value.filter((item: any) =>
-    JSON.stringify(item).toLowerCase().includes(searchQuery.value.toLowerCase())
-  )
-})
- 
 </script>
 
 <template>
-  <ContentLayout>
-    <IonToolbar>
-      <IonTitle>Timetable ({{ filteredData.length }})</IonTitle>
-    </IonToolbar>
-    <IonRow class="ion-align-items-center ion-justify-content-between">
-      <IonCol size="10">
-        <IonSearchbar v-model="searchQuery" placeholder="Buscar" />
+  <IonCard>
+    <IonCardHeader>
+      <IonCardTitle>Gerenciar Quadro de Horários</IonCardTitle>
+    </IonCardHeader>
+    <IonRow>
+      <IonCol>
+        <TeacherSelector v-model="selectedTeacherId" :teachers="teachers" />
       </IonCol>
-      <IonCol size="2" class="ion-text-end">
-        <IonButton id="add-btn" expand="block" class="ion-text-uppercase" @click="navigateToRegister">
-          <IonIcon slot="icon-only" :icon="add" class="ion-hide-sm-up" />
-          <IonIcon slot="start" :icon="add" class="ion-hide-sm-down" />
-          <span class="ion-hide-sm-down">Novo</span>
-        </IonButton>
+      <IonCol>
+        <ClassSelector v-model="selectedClassId" :classes="classes" />
       </IonCol>
     </IonRow>
-    <!-- Lista de itens utilizando o componente gerado -->
-    <Timetable :items="filteredData" @update:items="loadData" />
-  </ContentLayout>
+    <div v-if="selectedTeacher">
+      <h3>Disciplinas do Professor:</h3>
+      <SubjectList :subjects="teacherSubjects" />
+    </div>
+    <div v-if="selectedTeacher && selectedClass">
+      <h3>Monte o Quadro de Horários</h3>
+      <ScheduleGrid
+        :teacher-subjects="teacherSubjects"
+        :timetable="timetable"
+        :selected-teacher-id="selectedTeacherId"
+        :selected-class-id="selectedClassId"
+        @add="addToTimetable"
+      />
+    </div>
+  </IonCard>
 </template>
 
 <style scoped>
