@@ -2,16 +2,48 @@
 
 // Professores
 export const teachers = [
-  { id: 1, name: 'Olavo de Carvalho', email: 'olavo.carvalho@school.edu', phone: '(11) 99999-1111', subjects: [1, 2], availability: ['Segunda-07:00-12:00', 'Terça-07:00-12:00', 'Quarta-13:00-17:00'], preferences: { avoidFirstPeriod: true, preferredDays: ['Terça', 'Quarta'] } },
-  { id: 2, name: 'Luiz Felipe Pondé', email: 'lf.ponde@school.edu', phone: '(11) 99999-2222', subjects: [3, 4], availability: ['Segunda-13:00-18:00', 'Quinta-07:00-12:00'] },
-  { id: 3, name: 'Rodrigo Constantino', email: 'rodrigo.constantino@school.edu', phone: '(11) 99999-3333', subjects: [2, 5], availability: ['Terça-07:00-12:00', 'Quarta-07:00-12:00', 'Sexta-13:00-18:00'], preferences: { preferredDays: ['Sexta'] } },
-  { id: 4, name: 'Bruno Garschagen', email: 'bruno.garschagen@school.edu', phone: '(11) 99999-4444', subjects: [1, 3], availability: ['Segunda-07:00-12:00', 'Quinta-13:00-18:00'] },
-  { id: 5, name: 'Flávio Morgenstern', email: 'flavio.morgenstern@school.edu', phone: '(11) 99999-5555', subjects: [6, 7], availability: ['Segunda-07:00-12:00', 'Quarta-07:00-12:00'], preferences: { preferredDays: ['Segunda', 'Quarta'] } },
-  { id: 6, name: 'Paulo Kogos', email: 'paulo.kogos@school.edu', phone: '(11) 99999-6666', subjects: [8, 9], availability: ['Terça-13:00-18:00', 'Quinta-13:00-18:00'] },
-  { id: 7, name: 'Kim Kataguiri', email: 'kim.kataguiri@school.edu', phone: '(11) 99999-7777', subjects: [10, 11], availability: ['Sexta-07:00-12:00', 'Sexta-13:00-18:00'] },
-  { id: 8, name: 'Janaína Paschoal', email: 'janaina.paschoal@school.edu', phone: '(11) 99999-8888', subjects: [12, 13], availability: ['Quarta-07:00-12:00', 'Quinta-07:00-12:00'] },
-  { id: 9, name: 'Allan dos Santos', email: 'allan.santos@school.edu', phone: '(11) 99999-9999', subjects: [14, 15], availability: ['Segunda-13:00-18:00', 'Terça-13:00-18:00'] },
-  { id: 10, name: 'Nando Moura', email: 'nando.moura@school.edu', phone: '(11) 99999-1010', subjects: [16, 17], availability: ['Quarta-13:00-18:00', 'Sexta-13:00-18:00'] },
+  { id: 1, name: 'Olavo de Carvalho', email: 'olavo.carvalho@school.edu', phone: '(11) 99999-1111', subjects: [1, 2], availability: [
+    { day: 'Segunda', time: '07:00-12:00' },
+    { day: 'Terça', time: '07:00-12:00' },
+    { day: 'Quarta', time: '13:00-17:00' },
+  ], preferences: { avoidFirstPeriod: true, preferredDays: ['Terça', 'Quarta'] } },
+  { id: 2, name: 'Luiz Felipe Pondé', email: 'lf.ponde@school.edu', phone: '(11) 99999-2222', subjects: [3, 4], availability: [
+    { day: 'Segunda', time: '13:00-18:00' },
+    { day: 'Quinta', time: '07:00-12:00' },
+  ] },
+  { id: 3, name: 'Rodrigo Constantino', email: 'rodrigo.constantino@school.edu', phone: '(11) 99999-3333', subjects: [2, 5], availability: [
+    { day: 'Terça', time: '07:00-12:00' },
+    { day: 'Quarta', time: '07:00-12:00' },
+    { day: 'Sexta', time: '13:00-18:00' },
+  ], preferences: { preferredDays: ['Sexta'] } },
+  { id: 4, name: 'Bruno Garschagen', email: 'bruno.garschagen@school.edu', phone: '(11) 99999-4444', subjects: [1, 3], availability: [
+    { day: 'Segunda', time: '07:00-12:00' },
+    { day: 'Quinta', time: '13:00-18:00' },
+  ] },
+  { id: 5, name: 'Flávio Morgenstern', email: 'flavio.morgenstern@school.edu', phone: '(11) 99999-5555', subjects: [6, 7], availability: [
+    { day: 'Segunda', time: '07:00-12:00' },
+    { day: 'Quarta', time: '07:00-12:00' },
+  ], preferences: { preferredDays: ['Segunda', 'Quarta'] } },
+  { id: 6, name: 'Paulo Kogos', email: 'paulo.kogos@school.edu', phone: '(11) 99999-6666', subjects: [8, 9], availability: [
+    { day: 'Terça', time: '13:00-18:00' },
+    { day: 'Quinta', time: '13:00-18:00' },
+  ] },
+  { id: 7, name: 'Kim Kataguiri', email: 'kim.kataguiri@school.edu', phone: '(11) 99999-7777', subjects: [10, 11], availability: [
+    { day: 'Sexta', time: '07:00-12:00' },
+    { day: 'Sexta', time: '13:00-18:00' },
+  ] },
+  { id: 8, name: 'Janaína Paschoal', email: 'janaina.paschoal@school.edu', phone: '(11) 99999-8888', subjects: [12, 13], availability: [
+    { day: 'Quarta', time: '07:00-12:00' },
+    { day: 'Quinta', time: '07:00-12:00' },
+  ] },
+  { id: 9, name: 'Allan dos Santos', email: 'allan.santos@school.edu', phone: '(11) 99999-9999', subjects: [14, 15], availability: [
+    { day: 'Segunda', time: '13:00-18:00' },
+    { day: 'Terça', time: '13:00-18:00' },
+  ] },
+  { id: 10, name: 'Nando Moura', email: 'nando.moura@school.edu', phone: '(11) 99999-1010', subjects: [16, 17], availability: [
+    { day: 'Quarta', time: '13:00-18:00' },
+    { day: 'Sexta', time: '13:00-18:00' },
+  ] },
 ];
 
 // Disciplinas
