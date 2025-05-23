@@ -8,7 +8,7 @@ import 'swiper/css/effect-fade'
 import 'swiper/css/effect-coverflow'
 import { IonIcon, IonContent, IonList, IonItem, IonLabel, IonAvatar, IonReorderGroup, IonReorder, IonButton, IonModal, IonInput, IonSelect, IonSelectOption, IonDatetime, IonAlert, IonFab, IonFabButton } from '@ionic/vue'
 import { chevronBack, chevronForward, school, personCircle, sparkles, addCircle } from 'ionicons/icons'
-import { timetables, classes, subjects, teachers, rooms } from '../services/fakeData'
+import { timetables, classes, subjects, teachers, rooms, breaks, curriculumByStageAndYear } from '../services/fakeData'
 import { nanoid } from 'nanoid'
 
 const diasSemana = [
@@ -38,7 +38,18 @@ const getTeacherInitials = (id: number) => {
   const name = getTeacher(id)?.name || ''
   return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2)
 }
-const getRoomName = (id: number) => rooms.find(r => r.id === id)?.name || '---'
+const getRoom = (id: number) => rooms.find(r => r.id === id)
+const getRoomName = (id: number) => getRoom(id)?.name || '---'
+const getRoomBreaks = (id: number) => {
+  const room = getRoom(id)
+  if (!room || !room.breakIds) return []
+  return room.breakIds.map((breakId: number) => breaks.find(b => b.id === breakId)).filter(Boolean)
+}
+const getRoomAvailability = (id: number) => {
+  const room = getRoom(id)
+  if (!room || !room.availability) return []
+  return room.availability
+}
 
 function onSwiper(swiper: any) {
   swiperInstance.value = swiper;

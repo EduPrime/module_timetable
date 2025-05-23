@@ -2,16 +2,16 @@
 
 // Professores
 export const teachers = [
-  { id: 1, name: 'Mr. John Smith', email: 'john.smith@school.edu', phone: '(11) 99999-1111', subjects: [1, 2], availability: ['Segunda-07:00-12:00', 'Terça-07:00-12:00', 'Quarta-13:00-17:00'], preferences: { avoidFirstPeriod: true, preferredDays: ['Terça', 'Quarta'] } },
-  { id: 2, name: 'Mrs. Emily Davis', email: 'emily.davis@school.edu', phone: '(11) 99999-2222', subjects: [3, 4], availability: ['Segunda-13:00-18:00', 'Quinta-07:00-12:00'] },
-  { id: 3, name: 'Ms. Ana Souza', email: 'ana.souza@school.edu', phone: '(11) 99999-3333', subjects: [2, 5], availability: ['Terça-07:00-12:00', 'Quarta-07:00-12:00', 'Sexta-13:00-18:00'], preferences: { preferredDays: ['Sexta'] } },
-  { id: 4, name: 'Mr. Carlos Lima', email: 'carlos.lima@school.edu', phone: '(11) 99999-4444', subjects: [1, 3], availability: ['Segunda-07:00-12:00', 'Quinta-13:00-18:00'] },
-  { id: 5, name: 'Prof. Mariana Oliveira', email: 'mariana.oliveira@school.edu', phone: '(11) 99999-5555', subjects: [6, 7], availability: ['Segunda-07:00-12:00', 'Quarta-07:00-12:00'], preferences: { preferredDays: ['Segunda', 'Quarta'] } },
-  { id: 6, name: 'Prof. Paulo Mendes', email: 'paulo.mendes@school.edu', phone: '(11) 99999-6666', subjects: [8, 9], availability: ['Terça-13:00-18:00', 'Quinta-13:00-18:00'] },
-  { id: 7, name: 'Profª. Luciana Reis', email: 'luciana.reis@school.edu', phone: '(11) 99999-7777', subjects: [10, 11], availability: ['Sexta-07:00-12:00', 'Sexta-13:00-18:00'] },
-  { id: 8, name: 'Prof. Roberto Nunes', email: 'roberto.nunes@school.edu', phone: '(11) 99999-8888', subjects: [12, 13], availability: ['Quarta-07:00-12:00', 'Quinta-07:00-12:00'] },
-  { id: 9, name: 'Profª. Sandra Lima', email: 'sandra.lima@school.edu', phone: '(11) 99999-9999', subjects: [14, 15], availability: ['Segunda-13:00-18:00', 'Terça-13:00-18:00'] },
-  { id: 10, name: 'Prof. Felipe Martins', email: 'felipe.martins@school.edu', phone: '(11) 99999-1010', subjects: [16, 17], availability: ['Quarta-13:00-18:00', 'Sexta-13:00-18:00'] },
+  { id: 1, name: 'Olavo de Carvalho', email: 'olavo.carvalho@school.edu', phone: '(11) 99999-1111', subjects: [1, 2], availability: ['Segunda-07:00-12:00', 'Terça-07:00-12:00', 'Quarta-13:00-17:00'], preferences: { avoidFirstPeriod: true, preferredDays: ['Terça', 'Quarta'] } },
+  { id: 2, name: 'Luiz Felipe Pondé', email: 'lf.ponde@school.edu', phone: '(11) 99999-2222', subjects: [3, 4], availability: ['Segunda-13:00-18:00', 'Quinta-07:00-12:00'] },
+  { id: 3, name: 'Rodrigo Constantino', email: 'rodrigo.constantino@school.edu', phone: '(11) 99999-3333', subjects: [2, 5], availability: ['Terça-07:00-12:00', 'Quarta-07:00-12:00', 'Sexta-13:00-18:00'], preferences: { preferredDays: ['Sexta'] } },
+  { id: 4, name: 'Bruno Garschagen', email: 'bruno.garschagen@school.edu', phone: '(11) 99999-4444', subjects: [1, 3], availability: ['Segunda-07:00-12:00', 'Quinta-13:00-18:00'] },
+  { id: 5, name: 'Flávio Morgenstern', email: 'flavio.morgenstern@school.edu', phone: '(11) 99999-5555', subjects: [6, 7], availability: ['Segunda-07:00-12:00', 'Quarta-07:00-12:00'], preferences: { preferredDays: ['Segunda', 'Quarta'] } },
+  { id: 6, name: 'Paulo Kogos', email: 'paulo.kogos@school.edu', phone: '(11) 99999-6666', subjects: [8, 9], availability: ['Terça-13:00-18:00', 'Quinta-13:00-18:00'] },
+  { id: 7, name: 'Kim Kataguiri', email: 'kim.kataguiri@school.edu', phone: '(11) 99999-7777', subjects: [10, 11], availability: ['Sexta-07:00-12:00', 'Sexta-13:00-18:00'] },
+  { id: 8, name: 'Janaína Paschoal', email: 'janaina.paschoal@school.edu', phone: '(11) 99999-8888', subjects: [12, 13], availability: ['Quarta-07:00-12:00', 'Quinta-07:00-12:00'] },
+  { id: 9, name: 'Allan dos Santos', email: 'allan.santos@school.edu', phone: '(11) 99999-9999', subjects: [14, 15], availability: ['Segunda-13:00-18:00', 'Terça-13:00-18:00'] },
+  { id: 10, name: 'Nando Moura', email: 'nando.moura@school.edu', phone: '(11) 99999-1010', subjects: [16, 17], availability: ['Quarta-13:00-18:00', 'Sexta-13:00-18:00'] },
 ];
 
 // Disciplinas
@@ -54,15 +54,45 @@ export const classes = [
   { id: 11, name: '1ª Série EM', year: 2024, shift: 'Manhã', studentsCount: 33 },
   { id: 12, name: '2ª Série EM', year: 2024, shift: 'Tarde', studentsCount: 30 },
   { id: 13, name: '3ª Série EM', year: 2024, shift: 'Noite', studentsCount: 28 },
+  // Nova turma noturna
+  { id: 14, name: '1º Ano Noite', year: 2024, shift: 'Noite', studentsCount: 25 },
+];
+
+// Intervalos (Breaks)
+export const breaks = [
+  { id: 1, label: 'Intervalo da Manhã', start: '10:00', end: '10:30' },
+  { id: 2, label: 'Intervalo da Tarde', start: '15:00', end: '15:30' },
+  { id: 3, label: 'Intervalo da Noite', start: '20:00', end: '20:30' },
 ];
 
 // Salas
 export const rooms = [
-  { id: 1, name: 'Sala 101', type: 'Sala', capacity: 30, availability: ['Segunda-07:00-12:00', 'Terça-07:00-12:00', 'Quarta-07:00-12:00'] },
-  { id: 2, name: 'Laboratório de Ciências', type: 'Laboratório', capacity: 20, availability: ['Segunda-13:00-18:00', 'Quinta-07:00-12:00'] },
-  { id: 3, name: 'Quadra', type: 'Quadra', capacity: 50, availability: ['Sexta-07:00-12:00'] },
-  { id: 4, name: 'Sala 201', type: 'Sala', capacity: 30, availability: ['Segunda-13:00-18:00', 'Terça-13:00-18:00'] },
-  { id: 5, name: 'Auditório', type: 'Auditório', capacity: 100, availability: ['Quarta-13:00-18:00', 'Sexta-13:00-18:00'] },
+  { id: 1, name: 'Sala 101', type: 'Sala', capacity: 30, availability: [
+    { day: 'Segunda', time: '07:00-12:00' },
+    { day: 'Terça', time: '07:00-12:00' },
+    { day: 'Quarta', time: '07:00-12:00' },
+  ], breakIds: [1] },
+  { id: 2, name: 'Laboratório de Ciências', type: 'Laboratório', capacity: 20, availability: [
+    { day: 'Segunda', time: '13:00-18:00' },
+    { day: 'Quinta', time: '07:00-12:00' },
+  ], breakIds: [2] },
+  { id: 3, name: 'Quadra', type: 'Quadra', capacity: 50, availability: [
+    { day: 'Sexta', time: '07:00-12:00' },
+  ], breakIds: [1] },
+  { id: 4, name: 'Sala 201', type: 'Sala', capacity: 30, availability: [
+    { day: 'Segunda', time: '13:00-18:00' },
+    { day: 'Terça', time: '13:00-18:00' },
+  ], breakIds: [2] },
+  { id: 5, name: 'Auditório', type: 'Auditório', capacity: 100, availability: [
+    { day: 'Quarta', time: '13:00-18:00' },
+    { day: 'Sexta', time: '13:00-18:00' },
+  ], breakIds: [1, 2] },
+  // Nova sala noturna
+  { id: 6, name: 'Sala 301', type: 'Sala', capacity: 30, availability: [
+    { day: 'Segunda', time: '18:30-22:30' },
+    { day: 'Quarta', time: '18:30-22:30' },
+    { day: 'Sexta', time: '18:30-22:30' },
+  ], breakIds: [3] },
 ];
 
 // Horários (exemplo para algumas turmas)
@@ -209,3 +239,30 @@ export const conflicts = [
     suggestions: ['Trocar aula de Ciências para outro horário', 'Solicitar substituto para o horário'],
   },
 ];
+
+// Currículo obrigatório por etapa e ano/série
+export const curriculumByStageAndYear = {
+  'educacaoBasica': {
+    // Educação Infantil (exemplo, pode ser ajustado conforme legislação local)
+    1: [6, 7], // Educação Infantil: Educação Infantil, Psicomotricidade
+    2: [6, 7],
+  },
+  'fundamentalAnosIniciais': {
+    1: [15, 1, 4, 3, 5, 8, 9], // Português, Matemática, Ciências, História, Geografia, Artes, Educação Física
+    2: [15, 1, 4, 3, 5, 8, 9],
+    3: [15, 1, 4, 3, 5, 8, 9],
+    4: [15, 1, 4, 3, 5, 8, 9],
+    5: [15, 1, 4, 3, 5, 8, 9],
+  },
+  'fundamentalAnosFinais': {
+    6: [15, 1, 4, 3, 5, 8, 9, 2, 10, 11, 12, 13, 14], // Inclui Inglês, Biologia, Química, Física, Filosofia, Sociologia
+    7: [15, 1, 4, 3, 5, 8, 9, 2, 10, 11, 12, 13, 14],
+    8: [15, 1, 4, 3, 5, 8, 9, 2, 10, 11, 12, 13, 14],
+    9: [15, 1, 4, 3, 5, 8, 9, 2, 10, 11, 12, 13, 14],
+  },
+  'medio': {
+    1: [15, 1, 4, 3, 5, 8, 9, 2, 10, 11, 12, 13, 14, 16, 17], // Inclui Redação, Espanhol
+    2: [15, 1, 4, 3, 5, 8, 9, 2, 10, 11, 12, 13, 14, 16, 17],
+    3: [15, 1, 4, 3, 5, 8, 9, 2, 10, 11, 12, 13, 14, 16, 17],
+  },
+};
