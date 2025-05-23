@@ -70,23 +70,23 @@ export const subjects = [
 // Turmas (Infantil, Fundamental, Médio)
 export const classes = [
   // Educação Infantil
-  { id: 1, name: 'Infantil I', year: 2024, etapa: 'Educação Infantil', shift: 'Manhã', studentsCount: 18 },
-  { id: 2, name: 'Infantil II', year: 2024, etapa: 'Educação Infantil', shift: 'Tarde', studentsCount: 20 },
+  { id: 1, name: 'Infantil I', year: 1, etapa: 'Educação Infantil', shift: 'Manhã', studentsCount: 18, roomIds: [1] },
+  { id: 2, name: 'Infantil II', year: 2, etapa: 'Educação Infantil', shift: 'Tarde', studentsCount: 20, roomIds: [1] },
   // Ensino Fundamental Anos Iniciais
-  { id: 3, name: '1º ano A', year: 2024, etapa: 'Ensino Fundamental', shift: 'Manhã', studentsCount: 25 },
-  { id: 4, name: '1º ano B', year: 2024, etapa: 'Ensino Fundamental', shift: 'Tarde', studentsCount: 27 },
-  { id: 5, name: '2º ano', year: 2024, etapa: 'Ensino Fundamental', shift: 'Manhã', studentsCount: 26 },
-  { id: 6, name: '3º ano', year: 2024, etapa: 'Ensino Fundamental', shift: 'Tarde', studentsCount: 28 },
-  { id: 7, name: '6º ano', year: 2024, etapa: 'Ensino Fundamental', shift: 'Manhã', studentsCount: 30 },
-  { id: 8, name: '7º ano', year: 2024, etapa: 'Ensino Fundamental', shift: 'Tarde', studentsCount: 29 },
-  { id: 9, name: '8º ano', year: 2024, etapa: 'Ensino Fundamental', shift: 'Manhã', studentsCount: 31 },
-  { id: 10, name: '9º ano', year: 2024, etapa: 'Ensino Fundamental', shift: 'Tarde', studentsCount: 32 },
+  { id: 3, name: '1º ano A', year: 1, etapa: 'Ensino Fundamental', shift: 'Manhã', studentsCount: 25, roomIds: [1] },
+  { id: 4, name: '1º ano B', year: 1, etapa: 'Ensino Fundamental', shift: 'Tarde', studentsCount: 27, roomIds: [1] },
+  { id: 5, name: '2º ano', year: 2, etapa: 'Ensino Fundamental', shift: 'Manhã', studentsCount: 26, roomIds: [1] },
+  { id: 6, name: '3º ano', year: 3, etapa: 'Ensino Fundamental', shift: 'Tarde', studentsCount: 28, roomIds: [1] },
+  { id: 7, name: '6º ano', year: 6, etapa: 'Ensino Fundamental', shift: 'Manhã', studentsCount: 30, roomIds: [1, 2, 3] },
+  { id: 8, name: '7º ano', year: 7, etapa: 'Ensino Fundamental', shift: 'Tarde', studentsCount: 29, roomIds: [1, 2, 3] },
+  { id: 9, name: '8º ano', year: 8, etapa: 'Ensino Fundamental', shift: 'Manhã', studentsCount: 31, roomIds: [1, 2, 3] },
+  { id: 10, name: '9º ano', year: 9, etapa: 'Ensino Fundamental', shift: 'Tarde', studentsCount: 32, roomIds: [1, 2, 3] },
   // Ensino Médio
-  { id: 11, name: '1º ano EM', year: 2024, etapa: 'Ensino Médio', shift: 'Manhã', studentsCount: 33 },
-  { id: 12, name: '2º ano EM', year: 2024, etapa: 'Ensino Médio', shift: 'Tarde', studentsCount: 30 },
-  { id: 13, name: '3º ano EM', year: 2024, etapa: 'Ensino Médio', shift: 'Noite', studentsCount: 28 },
+  { id: 11, name: '1º ano EM', year: 1, etapa: 'Ensino Médio', shift: 'Manhã', studentsCount: 33, roomIds: [1, 2, 3, 4, 5, 6] },
+  { id: 12, name: '2º ano EM', year: 2, etapa: 'Ensino Médio', shift: 'Tarde', studentsCount: 30, roomIds: [1, 2, 3, 4, 5, 6] },
+  { id: 13, name: '3º ano EM', year: 3, etapa: 'Ensino Médio', shift: 'Noite', studentsCount: 28, roomIds: [1, 2, 3, 4, 5, 6] },
   // Nova turma noturna
-  { id: 14, name: '1º ano EM Noite', year: 2024, etapa: 'Ensino Médio', shift: 'Noite', studentsCount: 25 },
+  { id: 14, name: '1º ano EM Noite', year: 1, etapa: 'Ensino Médio', shift: 'Noite', studentsCount: 25, roomIds: [6, 1] },
 ];
 
 // Intervalos (Breaks)
@@ -280,10 +280,11 @@ export const conflicts = [
 export const curriculumByStageAndYear = {
   'educacaoBasica': {
     // Educação Infantil (exemplo, pode ser ajustado conforme legislação local)
-    1: [6, 7], // Educação Infantil: Educação Infantil, Psicomotricidade
-    2: [6, 7],
+    1: [6, 7, 8, 9], // Educação Infantil: Educação Infantil, Psicomotricidade, Artes, Educação Física
+    2: [6, 7, 8, 9],
   },
   'fundamentalAnosIniciais': {
+    // 1º ao 5º ano - BNCC: Português, Matemática, Ciências, História, Geografia, Artes, Educação Física, Inglês (a partir do 6º ano, mas algumas redes já incluem antes)
     1: [15, 1, 4, 3, 5, 8, 9], // Português, Matemática, Ciências, História, Geografia, Artes, Educação Física
     2: [15, 1, 4, 3, 5, 8, 9],
     3: [15, 1, 4, 3, 5, 8, 9],
@@ -291,13 +292,15 @@ export const curriculumByStageAndYear = {
     5: [15, 1, 4, 3, 5, 8, 9],
   },
   'fundamentalAnosFinais': {
+    // 6º ao 9º ano - BNCC: Português, Matemática, Ciências (Biologia, Física, Química), História, Geografia, Artes, Educação Física, Inglês, Filosofia, Sociologia
     6: [15, 1, 4, 3, 5, 8, 9, 2, 10, 11, 12, 13, 14], // Inclui Inglês, Biologia, Química, Física, Filosofia, Sociologia
     7: [15, 1, 4, 3, 5, 8, 9, 2, 10, 11, 12, 13, 14],
     8: [15, 1, 4, 3, 5, 8, 9, 2, 10, 11, 12, 13, 14],
     9: [15, 1, 4, 3, 5, 8, 9, 2, 10, 11, 12, 13, 14],
   },
   'medio': {
-    1: [15, 1, 4, 3, 5, 8, 9, 2, 10, 11, 12, 13, 14, 16, 17], // Inclui Redação, Espanhol
+    // Ensino Médio - BNCC: Português, Matemática, Ciências da Natureza (Biologia, Física, Química), Ciências Humanas (História, Geografia, Filosofia, Sociologia), Língua Estrangeira (Inglês/Espanhol), Artes, Educação Física, Redação
+    1: [15, 1, 4, 3, 5, 8, 9, 2, 10, 11, 12, 13, 14, 16, 17], // Português, Matemática, Ciências, História, Geografia, Artes, Educação Física, Inglês, Biologia, Química, Física, Filosofia, Sociologia, Redação, Espanhol
     2: [15, 1, 4, 3, 5, 8, 9, 2, 10, 11, 12, 13, 14, 16, 17],
     3: [15, 1, 4, 3, 5, 8, 9, 2, 10, 11, 12, 13, 14, 16, 17],
   },

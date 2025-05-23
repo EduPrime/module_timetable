@@ -1,15 +1,89 @@
 <script setup lang="ts">
+// Expor computeds e funções para o template
+
+// --- LÓGICA DE FILTRO E DISPONIBILIDADE ---
+const teacherFilter = ref('')
+
+
+// Teacher type compatible with fakeData.ts
+type Teacher = {
+  id: number
+  name: string
+  email: string
+  phone: string
+  subjects: number[]
+  availability?: { day: string; time: string }[]
+  preferences?: any
+}
+
+function isTeacherAvailable(teacher: Teacher): boolean {
+  if (!teacher.availability) return false
+  if (!addTargetDay.value || !addForm.start || !addForm.end) return true
+  // Verifica se o professor está disponível no horário
+  // teacher.availability: { day: string, time: string }[]
+  // addForm.start/end: 'HH:mm'
+  // time: '07:00-12:00'
+  return teacher.availability.some(a => {
+    if (a.day !== addTargetDay.value) return false
+    const [start, end] = a.time.split('-')
+    return start <= addForm.start && end >= addForm.end
+  })
+}
+
+// Disciplinas da etapa/série e, se professor selecionado, só as que ele pode lecionar
+const filteredSubjects = computed(() => {
+  if (!selectedClass.value) return []
+  // Buscar disciplinas obrigatórias da etapa/série
+  let etapaKey = ''
+  if (selectedClass.value.etapa === 'Educação Infantil') etapaKey = 'educacaoBasica'
+  else if (selectedClass.value.etapa === 'Ensino Fundamental') etapaKey = selectedClass.value.year <= 5 ? 'fundamentalAnosIniciais' : 'fundamentalAnosFinais'
+  else if (selectedClass.value.etapa === 'Ensino Médio') etapaKey = 'medio'
+  let obrigatorias: number[] = []
+  if (etapaKey && curriculumByStageAndYear[etapaKey]) {
+    obrigatorias = curriculumByStageAndYear[etapaKey][selectedClass.value.year] || []
+  }
+  let list = subjects.filter(s => obrigatorias.includes(s.id))
+  if (addForm.teacherId != null) {
+    const teacher = teachers.find((t: any) => t.id === addForm.teacherId)
+    if (teacher && teacher.subjects) {
+      list = list.filter(s => teacher.subjects.includes(s.id))
+    }
+  }
+  return list
+})
+
+// Professores que lecionam a disciplina selecionada, disponíveis no horário e filtrados por nome
+const filteredTeachers = computed(() => {
+  if (!addForm.subjectId) return []
+  let list = teachers as any[]
+  if (addForm.subjectId != null) {
+    list = list.filter((t: any) => t.subjects && t.subjects.includes(addForm.subjectId))
+  }
+  // Só exibe professores disponíveis no horário
+  list = list.filter((t: any) => isTeacherAvailable(t))
+  return list
+})
+
+const filteredRooms = computed(() => {
+  if (!selectedClass.value) return []
+  const turma = selectedClass.value
+  return rooms.map(room => {
+    let status = 'livre'
+    if (room.name.toLowerCase().includes('maintenance')) status = 'manutencao'
+    const fits = room.capacity >= turma.studentsCount
+    // Aqui você pode adicionar lógica para status ocupado, se necessário
+    return { ...room, fits, status }
+  }).filter(r => r.fits)
+})
 import { ref, computed, onMounted, reactive, watch, nextTick } from 'vue'
 import { DateTime } from 'luxon'
-import { Swiper, SwiperSlide } from 'swiper/vue'
-import 'swiper/css'
-import 'swiper/css/effect-cube'
-import 'swiper/css/effect-fade'
-import 'swiper/css/effect-coverflow'
-import { IonIcon, IonContent, IonList, IonItem, IonLabel, IonAvatar, IonReorderGroup, IonReorder, IonButton, IonModal, IonInput, IonSelect, IonSelectOption, IonDatetime, IonAlert, IonFab, IonFabButton, IonBadge } from '@ionic/vue'
+import { IonIcon, IonContent, IonList, IonItem, IonLabel, IonAvatar, IonReorderGroup, IonReorder, IonButton, IonModal, IonInput, IonSelect, IonSelectOption, IonDatetime, IonAlert, IonFab, IonFabButton, IonBadge, IonAccordion, IonAccordionGroup } from '@ionic/vue'
 import { chevronBack, chevronForward, school, personCircle, sparkles, addCircle } from 'ionicons/icons'
-import { timetables, classes, subjects, teachers, rooms, breaks, curriculumByStageAndYear } from '../services/fakeData'
+import { timetables, classes, subjects, teachers, rooms, breaks, curriculumByStageAndYear as _curriculumByStageAndYear } from '../services/fakeData'
 import { nanoid } from 'nanoid'
+
+// Adiciona tipagem para acesso dinâmico
+const curriculumByStageAndYear: Record<string, Record<number, number[]>> = _curriculumByStageAndYear as any
 
 const diasSemana = [
   'Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'
@@ -18,7 +92,6 @@ const diasSemana = [
 const today = DateTime.now()
 const currentDayIndex = ref(today.weekday % 7)
 const displayedDayIndex = ref(currentDayIndex.value)
-const swiperInstance = ref<any>(null)
 
 const getTimetableForDay = (dia: string) => {
   return timetables.find(t => t.day === dia && t.classId === selectedClassId.value)
@@ -100,6 +173,7 @@ const addForm = reactive({
   end: ''
 })
 const addTargetDay = ref('')
+const showWeekend = ref(false)
 
 // Salva snapshot ao trocar de dia
 watch(() => displayedDayIndex.value, (newIdx) => {
@@ -160,8 +234,20 @@ function addLesson() {
   showAddModal.value = false
 }
 
+// Tipagem para turma com roomIds
+type ClassWithRooms = {
+  id: number;
+  name: string;
+  year: number;
+  etapa: string;
+  shift: string;
+  studentsCount: number;
+  roomIds?: number[];
+};
 // Computa a turma selecionada
-const selectedClass = computed(() => classes.find(c => c.id === selectedClassId.value))
+const selectedClass = computed<ClassWithRooms | null>(() =>
+  selectedClassId.value ? (classes.find(c => c.id === selectedClassId.value) as ClassWithRooms) : null
+)
 
 // Função para obter a grade semanal da turma selecionada, filtrando por sala se necessário
 function getWeeklyTimetableForClassAndRoom(classId: number, salaId: number | null) {
@@ -177,7 +263,12 @@ function getWeeklyTimetableForClassAndRoom(classId: number, salaId: number | nul
 
 const weeklyTimetable = computed(() => {
   if (!selectedClassId.value) return []
-  return getWeeklyTimetableForClassAndRoom(selectedClassId.value, selectedSalaId.value)
+  // Se selectedSalaId for 'all' ou null, passa null para mostrar todas as salas
+  let salaId: number | undefined = undefined;
+  if (selectedSalaId.value !== null && selectedSalaId.value !== 'all') {
+    salaId = Number(selectedSalaId.value);
+  }
+  return getWeeklyTimetableForClassAndRoom(selectedClassId.value, salaId ?? null);
 })
 
 // Etapas segundo BNCC
@@ -187,66 +278,58 @@ const etapas = [
   { key: 'Ensino Médio', label: 'Ensino Médio' },
 ]
 
-const selectedEtapa = ref(etapas[0].key)
+const selectedEtapa = ref<string | null>(null)
 
 const filteredClasses = computed(() =>
-  classes.filter(c => c.etapa === selectedEtapa.value)
+  selectedEtapa.value
+    ? classes.filter(c => c.etapa === selectedEtapa.value)
+    : []
 )
 
-const selectedClassId = ref<number>(filteredClasses.value[0]?.id ?? 0)
+const selectedClassId = ref<number | null>(null)
+
+const availableRooms = computed(() => {
+  const turma = selectedClass.value;
+  if (!turma || !Array.isArray(turma.roomIds)) return [];
+  return rooms.filter(r => turma.roomIds!.includes(r.id));
+});
+
+const selectedSalaId = ref<string | number | null>(null)
+
+// Seleção automática de sala se só houver uma opção
+watch(availableRooms, (novas) => {
+  if (novas.length === 1) {
+    selectedSalaId.value = novas[0].id;
+  } else if (novas.length > 1) {
+    selectedSalaId.value = 'all';
+  } else {
+    selectedSalaId.value = null;
+  }
+});
 
 // Atualizar turma selecionada ao trocar etapa
-watch(selectedEtapa, (novo) => {
-  if (filteredClasses.value.length > 0) {
-    selectedClassId.value = filteredClasses.value[0].id
-  } else {
-    selectedClassId.value = 0
-  }
+watch(selectedEtapa, () => {
+  selectedClassId.value = null
+  selectedSalaId.value = null
+  addForm.subjectId = null
+  addForm.teacherId = null
+  addForm.roomId = null
+  addForm.start = ''
+  addForm.end = ''
 })
 
-// Atualizar turma selecionada se lista de turmas filtradas mudar
-watch(filteredClasses, (novas) => {
-  if (!novas.find(c => c.id === selectedClassId.value) && novas.length > 0) {
-    selectedClassId.value = novas[0].id
-  } else if (novas.length === 0) {
-    selectedClassId.value = 0
-  }
+watch(selectedClassId, () => {
+  selectedSalaId.value = null
+  addForm.subjectId = null
+  addForm.teacherId = null
+  addForm.roomId = null
+  addForm.start = ''
+  addForm.end = ''
 })
 
-// Aprimorar lógica de sugestão inteligente de sala
-function getAvailableRoomsForLesson(dia: string, start: string, end: string, subjectId: number, turmaId: number) {
-  const turma = classes.find(c => c.id === turmaId)
-  const subject = subjects.find(s => s.id === subjectId)
-  if (!turma || !subject) return []
-  // Requisitos de recursos para a disciplina
-  let requiredResources: string[] = []
-  if (subject.name.toLowerCase().includes('ciência') || subject.name.toLowerCase().includes('laboratório')) {
-    requiredResources.push('laboratório')
-  }
-  // Disponibilidade, recursos e capacidade
-  return rooms
-    .filter(room => {
-      // Disponibilidade no dia
-      const available = room.availability.some(a => a.day === dia)
-      // Recursos obrigatórios
-      const hasAllResources = requiredResources.every(res => room.resources.includes(res))
-      return available && hasAllResources
-    })
-    .map(room => {
-      // Score: quanto mais próximo da capacidade ideal, melhor
-      const fits = room.capacity >= turma.studentsCount
-      const capacityDiff = Math.abs(room.capacity - turma.studentsCount)
-      // Penalizar se não couber
-      const score = (fits ? 0 : 1000) + capacityDiff
-      return { ...room, score, fits }
-    })
-    .sort((a, b) => a.score - b.score)
-}
-
-const selectedSalaId = ref<number | null>(null)
-
-// Computar lista de salas disponíveis (todas as rooms)
-const availableRooms = computed(() => rooms)
+watch(addForm.subjectId, () => {
+  addForm.teacherId = null
+})
 </script>
 
 <template>
@@ -257,25 +340,46 @@ const availableRooms = computed(() => rooms)
       </ion-card-header>
       <ion-card-content>
         <!-- Seleção de etapa -->
-        <ion-select v-model="selectedEtapa" placeholder="Selecione a Etapa" :interface="'modal'" class="etapa-select" justify="start">
+        <ion-select label-placement="stacked" label="Selecione a Etapa" v-model="selectedEtapa"   :interface="'modal'" class="etapa-select" justify="start" placeholder="Escolha a etapa">
           <ion-select-option v-for="etapa in etapas" :key="etapa.key" :value="etapa.key">
             {{ etapa.label }}
           </ion-select-option>
         </ion-select>
         <!-- Seleção de ano/turma -->
-        <ion-select v-model="selectedClassId" placeholder="Selecione o Ano/Turma" :interface="'modal'" class="turma-select" justify="start">
+        <ion-select v-model="selectedClassId" label-placement="stacked" label="Selecione o Ano/Turma" :interface="'modal'" class="turma-select" justify="start" placeholder="Escolha a turma" :disabled="!selectedEtapa">
           <ion-select-option v-for="turma in filteredClasses" :key="turma.id" :value="turma.id">
             {{ turma.name }} ({{ turma.shift }})
           </ion-select-option>
         </ion-select>
         <!-- Seleção de sala -->
-        <ion-select v-model="selectedSalaId" placeholder="Selecione a Sala" :interface="'modal'" class="sala-select" justify="start">
-          <ion-select-option :value="null">Todas as salas</ion-select-option>
+        <ion-select v-model="selectedSalaId" label-placement="stacked" label="Selecione a Sala" :interface="'modal'" class="sala-select" justify="start" placeholder="Escolha a sala" :disabled="!selectedClassId">
+          <ion-select-option v-if="availableRooms.length > 1" value="all">Todas as salas</ion-select-option>
           <ion-select-option v-for="sala in availableRooms" :key="sala.id" :value="sala.id">
             {{ sala.name }} ({{ sala.capacity }} alunos)
             <ion-badge v-for="res in sala.resources" :key="res" color="tertiary" style="margin-left:4px;">{{ res }}</ion-badge>
           </ion-select-option>
         </ion-select>
+        <!-- NOVOS SELECTS: Disciplina e Professor -->
+        <ion-select label="Disciplina" label-placement="stacked"  v-model="addForm.subjectId" :interface="'popover'" class="disciplina-select" style="margin-bottom: 1rem;" placeholder="Escolha a disciplina" :disabled="!selectedClassId">
+          <ion-select-option v-for="s in filteredSubjects" :key="s.id" :value="s.id">{{ s.name }}</ion-select-option>
+        </ion-select>
+        <ion-select label="Professor" label-placement="stacked" v-model="addForm.teacherId" :interface="'popover'" class="professor-select" style="margin-bottom: 1rem;" placeholder="Escolha o professor" :disabled="!addForm.subjectId">
+          <ion-select-option v-for="t in filteredTeachers" :key="t.id" :value="t.id">
+            {{ t.name }}
+            <span style="display:block; font-size:0.85em; color:#888;">{{ getTeacherAvailabilityString(t.id) }}</span>
+          </ion-select-option>
+        </ion-select>
+        <!-- Botão de adicionar aula -->
+        <ion-button color="success" @click="addLesson" :disabled="!addForm.subjectId || !addForm.teacherId || !addForm.roomId || !addForm.start || !addForm.end">Adicionar Aula</ion-button>
+      </ion-card-content>
+    </ion-card>
+    <!-- Filtro para exibir/ocultar dom/sáb -->
+    <ion-card class="ion-margin-bottom">
+      <ion-card-content>
+        <ion-item>
+          <ion-label>Exibir fim de semana</ion-label>
+          <ion-toggle v-model="showWeekend"></ion-toggle>
+        </ion-item>
       </ion-card-content>
     </ion-card>
     <!-- Grade semanal da turma/sala selecionada -->
@@ -312,84 +416,64 @@ const availableRooms = computed(() => rooms)
         </div>
       </ion-card-content>
     </ion-card>
-    <ContentLayout>
-      <ion-card color="light" class="ion-margin-bottom">
-        <ion-card-header>
-          <ion-card-title>Construtores de horários</ion-card-title>
-        </ion-card-header>
-        </ion-card>
       <ion-content class="ion-padding timetable-content">
-        <div class="day-nav-bar">
-          <ion-icon :icon="chevronBack" class="nav-arrow" :class="{ disabled: displayedDayIndex === 0 }" @click="prevDay" />
-          <div class="day-title day-title-single" :key="displayedDayIndex">
-            {{ getDayNameByIndex(displayedDayIndex) }}
-            <span class="day-indicator"></span>
-          </div>
-          <ion-icon :icon="chevronForward" class="nav-arrow" :class="{ disabled: displayedDayIndex === diasSemana.length - 1 }" @click="nextDay" />
-        </div>
         <div class="week-progress-bar">
-          <div class="progress" :style="{ width: ((displayedDayIndex+1)/diasSemana.length*100)+'%' }"></div>
+          <div class="progress" :style="{ width: '100%' }"></div>
         </div>
-        <Swiper
-          :initial-slide="currentDayIndex"
-          :effect="'coverflow'"
-          :slides-per-view="1"
-          :centered-slides="true"
-          @slideChange="onSlideChange"
-          @swiper="onSwiper"
-          class="swiper-container timetable-swiper"
-        >
-          <SwiperSlide v-for="(dia, index) in diasSemana" :key="dia">
-            <div class="slide-content animate-fade-in">
-              <ion-reorder-group
-                :disabled="false"
-                @ionItemReorder="event => onReorder(event, dia)"
-                class="lessons-list"
-                :key="dia"
-              >
-                <ion-item style="max-width: 300px;"
-                  v-for="(lesson, idx) in getTimetableForDay(dia)?.lessons || []"
-                  :key="lesson.id"
-                  class="lesson-card"
-                  :style="{ borderLeft: '6px solid ' + getSubjectColor(lesson.subjectId) }"
+        <ion-accordion-group expand="inset" :multiple="false">
+          <ion-accordion v-for="(dia, index) in diasSemana" :key="dia" :value="dia">
+            <template #header>
+              <ion-item button detail="false">
+                <ion-label>{{ dia }}</ion-label>
+              </ion-item>
+            </template>
+            <template #content>
+              <div class="slide-content animate-fade-in">
+                <ion-reorder-group
+                  :disabled="false"
+                  @ionItemReorder="event => onReorder(event, dia)"
+                  class="lessons-list"
+                  :key="dia"
                 >
-                  <ion-reorder slot="start" />
-                  <ion-label>
-                    <div class="lesson-time">{{ lesson.start }} - {{ lesson.end }}</div>
-                    <div class="lesson-main">
-                      <span class="subject" :style="{ color: getSubjectColor(lesson.subjectId) }">
-                        {{ getSubjectName(lesson.subjectId) }}
-                      </span>
-                      <span class="teacher">com {{ getTeacherName(lesson.teacherId) }}</span>
-                    </div>
-                    <div class="lesson-meta">
-                      <ion-icon :icon="school" class="meta-icon" />
-                      <span>{{ getRoomName(lesson.roomId) }}</span>
-                      <ion-icon :icon="lesson.status === 'ia' ? sparkles : personCircle" class="meta-icon status-icon" :class="lesson.status" />
-                      <span class="status-label">{{ lesson.status === 'ia' ? 'Sugestão IA' : 'Manual' }}</span>
-                    </div>
-                    <div v-if="lesson && 'conflict' in lesson && lesson.conflict" class="conflict-alert">
-                      <ion-icon name="alert-circle" color="danger" />
-                      <span>{{ lesson.conflict }}</span>
-                    </div>
-                  </ion-label>
-                </ion-item>
-                <ion-item v-if="!(getTimetableForDay(dia)?.lessons?.length)" class="no-lesson-card">
-                  <ion-label>
-                    <ion-icon name="calendar-clear-outline" class="no-lesson-icon" />
-                    Nenhuma aula programada.
-                  </ion-label>
-                </ion-item>
-              </ion-reorder-group>
-            </div>
-          </SwiperSlide>
-        </Swiper>
-        <!-- FAB para adicionar nova aula -->
-        <ion-fab horizontal="end" >
-          <ion-fab-button  @click="openAddModal(diasSemana[displayedDayIndex])">
-            <ion-icon :icon="addCircle"></ion-icon>
-          </ion-fab-button>
-        </ion-fab>
+                  <ion-item style="max-width: 300px;"
+                    v-for="(lesson, idx) in getTimetableForDay(dia)?.lessons || []"
+                    :key="lesson.id"
+                    class="lesson-card"
+                    :style="{ borderLeft: '6px solid ' + getSubjectColor(lesson.subjectId) }"
+                  >
+                    <ion-reorder slot="start" />
+                    <ion-label>
+                      <div class="lesson-time">{{ lesson.start }} - {{ lesson.end }}</div>
+                      <div class="lesson-main">
+                        <span class="subject" :style="{ color: getSubjectColor(lesson.subjectId) }">
+                          {{ getSubjectName(lesson.subjectId) }}
+                        </span>
+                        <span class="teacher">com {{ getTeacherName(lesson.teacherId) }}</span>
+                      </div>
+                      <div class="lesson-meta">
+                        <ion-icon :icon="school" class="meta-icon" />
+                        <span>{{ getRoomName(lesson.roomId) }}</span>
+                        <ion-icon :icon="lesson.status === 'ia' ? sparkles : personCircle" class="meta-icon status-icon" :class="lesson.status" />
+                        <span class="status-label">{{ lesson.status === 'ia' ? 'Sugestão IA' : 'Manual' }}</span>
+                      </div>
+                      <div v-if="lesson && 'conflict' in lesson && lesson.conflict" class="conflict-alert">
+                        <ion-icon name="alert-circle" color="danger" />
+                        <span>{{ lesson.conflict }}</span>
+                      </div>
+                    </ion-label>
+                  </ion-item>
+                  <ion-item v-if="!(getTimetableForDay(dia)?.lessons?.length)" class="no-lesson-card">
+                    <ion-label>
+                      <ion-icon name="calendar-clear-outline" class="no-lesson-icon" />
+                      Nenhuma aula programada.
+                    </ion-label>
+                  </ion-item>
+                </ion-reorder-group>
+              </div>
+            </template>
+          </ion-accordion>
+        </ion-accordion-group>
+      
         <!-- Modal de confirmação de alteração -->
         <ion-alert
           :is-open="showConfirmModal"
@@ -401,42 +485,7 @@ const availableRooms = computed(() => rooms)
           ]"
           @didDismiss="showConfirmModal = false"
         />
-        <!-- Modal de adicionar nova aula -->
-        <ion-modal :is-open="showAddModal" @didDismiss="showAddModal = false">
-          <div class="add-lesson-modal">
-            <h3>Adicionar nova aula</h3>
-            <ion-select label="Disciplina" v-model="addForm.subjectId" :interface="'popover'">
-              <ion-select-option v-for="s in subjects" :key="s.id" :value="s.id">{{ s.name }}</ion-select-option>
-            </ion-select>
-            <ion-select label="Professor" v-model="addForm.teacherId" :interface="'popover'">
-              <ion-select-option v-for="t in teachers" :key="t.id" :value="t.id">
-                {{ t.name }}
-                <span style="display:block; font-size:0.85em; color:#888;">
-                  {{ getTeacherAvailabilityString(t.id) }}
-                </span>
-              </ion-select-option>
-            </ion-select>
-            <ion-select label="Sala" v-model="addForm.roomId" :interface="'popover'">
-              <ion-select-option v-for="(r, idx) in (selectedClass && typeof addForm.subjectId === 'number' ? getAvailableRoomsForLesson(addTargetDay, addForm.start, addForm.end, addForm.subjectId, selectedClassId) : [])" :key="r.id" :value="r.id">
-                <span :style="idx === 0 ? 'font-weight:bold;color:#388e3c;' : ''">
-                  {{ r.name }} ({{ r.capacity }} alunos)
-                  <span v-if="selectedClass && r.capacity < selectedClass.studentsCount" style="color:#d32f2f;font-weight:bold;"> - Não comporta turma</span>
-                  <ion-badge v-for="res in r.resources" :key="res" color="tertiary" style="margin-left:4px;">{{ res }}</ion-badge>
-                  <ion-badge v-if="idx === 0" color="success" style="margin-left:4px;">Sugerida</ion-badge>
-                </span>
-                <span v-if="idx === 0" style="display:block;font-size:0.85em;color:#388e3c;">{{ r.fits ? 'Comporta a turma e possui recursos ideais' : 'Possui recursos, mas não comporta todos os alunos' }}</span>
-              </ion-select-option>
-            </ion-select>
-            <ion-input label="Início" v-model="addForm.start" placeholder="08:00" />
-            <ion-input label="Fim" v-model="addForm.end" placeholder="08:50" />
-            <div class="add-lesson-actions">
-              <ion-button color="medium" fill="outline" @click="showAddModal = false">Cancelar</ion-button>
-              <ion-button color="success" @click="addLesson" :disabled="!addForm.subjectId || !addForm.teacherId || !addForm.roomId || !addForm.start || !addForm.end">Adicionar</ion-button>
-            </div>
-          </div>
-        </ion-modal>
       </ion-content>
-    </ContentLayout>
   </ContentLayout>
 </template>
 
