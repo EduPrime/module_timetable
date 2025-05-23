@@ -70,24 +70,23 @@ export const subjects = [
 // Turmas (Infantil, Fundamental, Médio)
 export const classes = [
   // Educação Infantil
-  { id: 1, name: 'Infantil I', year: 2024, shift: 'Manhã', studentsCount: 18 },
-  { id: 2, name: 'Infantil II', year: 2024, shift: 'Tarde', studentsCount: 20 },
+  { id: 1, name: 'Infantil I', year: 2024, etapa: 'Educação Infantil', shift: 'Manhã', studentsCount: 18 },
+  { id: 2, name: 'Infantil II', year: 2024, etapa: 'Educação Infantil', shift: 'Tarde', studentsCount: 20 },
   // Ensino Fundamental Anos Iniciais
-  { id: 3, name: '1º Ano A', year: 2024, shift: 'Manhã', studentsCount: 25 },
-  { id: 4, name: '1º Ano B', year: 2024, shift: 'Tarde', studentsCount: 27 },
-  { id: 5, name: '2º Ano', year: 2024, shift: 'Manhã', studentsCount: 26 },
-  { id: 6, name: '3º Ano', year: 2024, shift: 'Tarde', studentsCount: 28 },
-  // Ensino Fundamental Anos Finais
-  { id: 7, name: '6º Ano', year: 2024, shift: 'Manhã', studentsCount: 30 },
-  { id: 8, name: '7º Ano', year: 2024, shift: 'Tarde', studentsCount: 29 },
-  { id: 9, name: '8º Ano', year: 2024, shift: 'Manhã', studentsCount: 31 },
-  { id: 10, name: '9º Ano', year: 2024, shift: 'Tarde', studentsCount: 32 },
+  { id: 3, name: '1º ano A', year: 2024, etapa: 'Ensino Fundamental', shift: 'Manhã', studentsCount: 25 },
+  { id: 4, name: '1º ano B', year: 2024, etapa: 'Ensino Fundamental', shift: 'Tarde', studentsCount: 27 },
+  { id: 5, name: '2º ano', year: 2024, etapa: 'Ensino Fundamental', shift: 'Manhã', studentsCount: 26 },
+  { id: 6, name: '3º ano', year: 2024, etapa: 'Ensino Fundamental', shift: 'Tarde', studentsCount: 28 },
+  { id: 7, name: '6º ano', year: 2024, etapa: 'Ensino Fundamental', shift: 'Manhã', studentsCount: 30 },
+  { id: 8, name: '7º ano', year: 2024, etapa: 'Ensino Fundamental', shift: 'Tarde', studentsCount: 29 },
+  { id: 9, name: '8º ano', year: 2024, etapa: 'Ensino Fundamental', shift: 'Manhã', studentsCount: 31 },
+  { id: 10, name: '9º ano', year: 2024, etapa: 'Ensino Fundamental', shift: 'Tarde', studentsCount: 32 },
   // Ensino Médio
-  { id: 11, name: '1ª Série EM', year: 2024, shift: 'Manhã', studentsCount: 33 },
-  { id: 12, name: '2ª Série EM', year: 2024, shift: 'Tarde', studentsCount: 30 },
-  { id: 13, name: '3ª Série EM', year: 2024, shift: 'Noite', studentsCount: 28 },
+  { id: 11, name: '1º ano EM', year: 2024, etapa: 'Ensino Médio', shift: 'Manhã', studentsCount: 33 },
+  { id: 12, name: '2º ano EM', year: 2024, etapa: 'Ensino Médio', shift: 'Tarde', studentsCount: 30 },
+  { id: 13, name: '3º ano EM', year: 2024, etapa: 'Ensino Médio', shift: 'Noite', studentsCount: 28 },
   // Nova turma noturna
-  { id: 14, name: '1º Ano Noite', year: 2024, shift: 'Noite', studentsCount: 25 },
+  { id: 14, name: '1º ano EM Noite', year: 2024, etapa: 'Ensino Médio', shift: 'Noite', studentsCount: 25 },
 ];
 
 // Intervalos (Breaks)
@@ -99,32 +98,37 @@ export const breaks = [
 
 // Salas
 export const rooms = [
-  { id: 1, name: 'Sala 101', type: 'Sala', capacity: 30, availability: [
+  { id: 1, name: 'Sala 101', type: 'Sala', capacity: 30, resources: ['multimídia'], availability: [
     { day: 'Segunda', time: '07:00-12:00' },
     { day: 'Terça', time: '07:00-12:00' },
     { day: 'Quarta', time: '07:00-12:00' },
   ], breakIds: [1] },
-  { id: 2, name: 'Laboratório de Ciências', type: 'Laboratório', capacity: 20, availability: [
+  { id: 2, name: 'Laboratório de Ciências', type: 'Laboratório', capacity: 20, resources: ['laboratório', 'multimídia', 'acessibilidade'], availability: [
     { day: 'Segunda', time: '13:00-18:00' },
     { day: 'Quinta', time: '07:00-12:00' },
   ], breakIds: [2] },
-  { id: 3, name: 'Quadra', type: 'Quadra', capacity: 50, availability: [
+  { id: 3, name: 'Quadra', type: 'Quadra', capacity: 50, resources: ['esportes', 'acessibilidade'], availability: [
     { day: 'Sexta', time: '07:00-12:00' },
   ], breakIds: [1] },
-  { id: 4, name: 'Sala 201', type: 'Sala', capacity: 30, availability: [
+  { id: 4, name: 'Sala 201', type: 'Sala', capacity: 20, resources: ['acessibilidade'], availability: [
     { day: 'Segunda', time: '13:00-18:00' },
     { day: 'Terça', time: '13:00-18:00' },
   ], breakIds: [2] },
-  { id: 5, name: 'Auditório', type: 'Auditório', capacity: 100, availability: [
+  { id: 5, name: 'Auditório', type: 'Auditório', capacity: 100, resources: ['multimídia', 'acessibilidade'], availability: [
     { day: 'Quarta', time: '13:00-18:00' },
     { day: 'Sexta', time: '13:00-18:00' },
   ], breakIds: [1, 2] },
   // Nova sala noturna
-  { id: 6, name: 'Sala 301', type: 'Sala', capacity: 30, availability: [
+  { id: 6, name: 'Sala 301', type: 'Sala', capacity: 35, resources: ['multimídia'], availability: [
     { day: 'Segunda', time: '18:30-22:30' },
     { day: 'Quarta', time: '18:30-22:30' },
     { day: 'Sexta', time: '18:30-22:30' },
   ], breakIds: [3] },
+  // Sala pequena
+  { id: 7, name: 'Sala 102', type: 'Sala', capacity: 15, resources: [], availability: [
+    { day: 'Terça', time: '07:00-12:00' },
+    { day: 'Quinta', time: '07:00-12:00' },
+  ], breakIds: [1] },
 ];
 
 // Horários (exemplo para algumas turmas)
